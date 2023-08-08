@@ -18,11 +18,15 @@ def on_subscribe(client, userdata, mid, granted_qos, properties=None):
 def on_message(client, userdata, msg):
     print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
 
+def on_subscribe_callback(self):
+    print(self)
+
 # using MQTT version 5 here, for 3.1.1: MQTTv311, 3.1: MQTTv31
 # userdata is user defined data of any type, updated by user_data_set()
 # client_id is the given name of the client
 client = paho.Client(client_id="", userdata=None, protocol=paho.MQTTv5)
 client.on_connect = on_connect
+client.subscribe_callback = on_subscribe_callback
 
 # enable TLS for secure connection
 client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
@@ -36,14 +40,18 @@ client.on_subscribe = on_subscribe
 client.on_message = on_message
 client.on_publish = on_publish
 
-client.loop_start()
-
 # subscribe to all topics of encyclopedia by using the wildcard "#"
 client.subscribe("encyclopedia/#", qos=1)
 
 # a single publish, this can also be done in loops, etc.
-client.publish("encyclopedia/temperature", payload="Dillerkaj", qos=1)
+while True:
+    client.loop_start()
+    client.publish("encyclopedia/temperature", payload="Dillerkaj", qos=1)
+    client.loop_stop()
+    
+    time.sleep(1)
 
 # loop_forever for simplicity, here you need to stop the loop manually
 # you can also use loop_start and loop_stop
-client.loop_stop()
+
+# client.loop_forever()
