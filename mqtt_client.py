@@ -48,7 +48,7 @@ while True:
     client.loop_start()
     client.publish("encyclopedia/temperature", payload="Dillerkaj", qos=1)
     client.loop_stop()
-    
+     
     time.sleep(1)
 
 # loop_forever for simplicity, here you need to stop the loop manually
